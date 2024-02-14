@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 class SecondPage extends StatelessWidget {
@@ -8,10 +9,21 @@ class SecondPage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-          onPressed: () => throw FormatException("Format Exception Example"),
+          onPressed: () {
+            try {
+              throw FormatException("Example error");
+            } catch (error, stackTrace) {
+              _recordErrorToCrashlytics(error, stackTrace);
+            }
+          },
           child: Text("Format Exception"),
         ),
       ),
     );
+  }
+
+  Future<void> _recordErrorToCrashlytics(
+      dynamic error, StackTrace? stackTrace) async {
+    await FirebaseCrashlytics.instance.recordError(error, stackTrace);
   }
 }
